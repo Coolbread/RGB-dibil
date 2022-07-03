@@ -1,0 +1,47 @@
+from PIL import Image
+import requests
+from io import BytesIO
+from scipy.spatial import KDTree
+from webcolors import CSS3_HEX_TO_NAMES, hex_to_rgb
+
+
+def find_image():
+	url = input()
+	response = requests.get(url)
+	img = Image.open(BytesIO(response.content))
+	return img
+
+def split_css3_hex_to_names():
+	names = []
+	rgb_values = []
+	for color_hex,color_name in CSS3_HEX_TO_NAMES.items():
+		names.append(color_name)
+		rgb_values.append(hex_to_rgb(color_hex))
+	return names,rgb_values
+
+def count_colors():
+	img = find_image()
+	width = img.size[0]
+	height = img.size[1]
+	pix = img.load()
+	colors = {}
+	names, rgb_values = split_css3_hex_to_names()
+	for x in range(width):
+		for y in range(height):
+			r = pix[x,y][0]
+			g = pix[x,y][1]
+			b = pix[x,y][2]
+			rgb = (r,g,b)
+			kdt_db = KDTree(rgb_values)
+			distance,index = kdt_db.query(rgb)
+			name = names[index]
+
+			if name in colors:
+				colors[name] += 1
+			else:
+				colors[name] = 1
+		print(colors)
+
+	return colors
+
+print(count_colors())
