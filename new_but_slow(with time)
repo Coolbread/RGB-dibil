@@ -16,9 +16,9 @@ def find_nearest(rgb):
 	min_euq_r = 10**6
 	for key, name in CSS3_HEX_TO_NAMES.items():
 		r_n,g_n,b_n = hex_to_rgb(key)
-		r_euq = (r_n-r)**2
-		g_euq = (g_n-g)**2
-		b_euq = (b_n-b)**2
+		r_euq = (r_n-r)*(r_n-r)
+		g_euq = (g_n-g)*(g_n-g)
+		b_euq = (b_n-b)*(b_n-b)
 		if min_euq_r>b_euq+g_euq+r_euq:
 			min_euq_r = b_euq+g_euq+r_euq
 			nearest_color = name
@@ -39,11 +39,11 @@ def count_colors():
 			g = pix[x,y][1]
 			b = pix[x,y][2]
 			rgb = (r,g,b)
-			print("Здесь начинается функция поиска ближайших - "+ str(time.time()-start_time))
-			start_time = time.time()
+			#print("Здесь начинается функция поиска ближайших - "+ str(time.time()-start_time))
+			#start_time = time.time()
 			name = find_nearest(rgb)
-			print("Здесь заканчивается функция поиска ближайших - "+ str(time.time()-start_time))
-			start_time = time.time()
+			#print("Здесь заканчивается функция поиска ближайших - "+ str(time.time()-start_time))
+			#start_time = time.time()
 			if name in colors:
 				colors[name] += 1
 			else:
