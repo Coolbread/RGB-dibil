@@ -1,0 +1,79 @@
+from PIL import Image
+import requests
+from io import BytesIO
+from webcolors import hex_to_rgb
+
+
+hex_to_names = {
+	"#000000" : "Black",
+	"#808080" : "Gray",
+	"#FFFFFF" : "White",
+	"#FF00FF" : "Fuchsia",
+	"#800080" : "Purple",
+	"#ff0000" : "Red",
+	"#800000" : "Maroon",
+	"#ffff00" : "Yellow",
+	"#808000" : "Olive",
+	"#00ff00" : "Lime",
+	"#008000" : "Green",
+	"#00ffff" : "Aqua",
+	"#008080" : "Teal",
+	"#0000ff" : "Blue",
+	"#000080" : "Navy",
+	"#a52a2a" : "Brown",
+	"#f5deb3" : "Wheat",
+	"#a0522d" : "Sienna",
+	"#ffdab9" : "PeachPuff",
+	"#4b0082" : "Indigo",
+	"#9400d3" : "DarkViolet",
+	"#ff1493" : "DeepPink",
+
+}
+
+def find_image():
+	url = input()
+	response = requests.get(url)
+	img = Image.open(BytesIO(response.content))
+	return img
+
+def find_nearest(rgb):
+	#найдем минимальное евклидово расстояние
+	r,g,b = rgb
+	min_euq_r = 10**6
+	for key in hex_to_names:
+		name = hex_to_names[key]
+		r_n,g_n,b_n = hex_to_rgb(key)
+		r_euq = (r_n-r)**2
+		g_euq = (g_n-g)**2
+		b_euq = (b_n-b)**2
+		if min_euq_r>b_euq+g_euq+r_euq:
+			min_euq_r = b_euq+g_euq+r_euq
+			nearest_color = name
+	return nearest_color
+
+def count_colors():
+	img = find_image()
+	width = img.size[0]
+	height = img.size[1]
+	pix = img.load()
+	colors = {}
+	for x in range(0,width,10):
+		for y in range(0,height,10):
+			r = pix[x,y][0]
+			g = pix[x,y][1]
+			b = pix[x,y][2]
+			rgb = (r,g,b)
+			name = find_nearest(rgb)
+
+			if name in colors:
+				colors[name] += 1
+			else:
+				colors[name] = 1
+	return (colors, width*height)
+
+colors,size = count_colors()
+new_colors = {}
+for key in colors:
+	percent = colors[key]*10000 / size
+	new_colors[key] = f"{percent:.{1}f}"
+print(new_colors)
