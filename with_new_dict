@@ -43,9 +43,9 @@ def find_nearest(rgb):
 	for key in hex_to_names:
 		name = hex_to_names[key]
 		r_n,g_n,b_n = hex_to_rgb(key)
-		r_euq = (r_n-r)**2
-		g_euq = (g_n-g)**2
-		b_euq = (b_n-b)**2
+		r_euq = (r_n-r)*(r_n-r)
+		g_euq = (g_n-g)*(g_n-g)
+		b_euq = (b_n-b)*(b_n-b)
 		if min_euq_r>b_euq+g_euq+r_euq:
 			min_euq_r = b_euq+g_euq+r_euq
 			nearest_color = name
