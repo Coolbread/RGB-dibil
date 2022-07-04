@@ -2,7 +2,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 from webcolors import CSS3_HEX_TO_NAMES, hex_to_rgb
-
+import time
 
 def find_image():
 	url = input()
@@ -25,26 +25,32 @@ def find_nearest(rgb):
 	return nearest_color
 
 def count_colors():
+	start_time = time.time()
 	img = find_image()
 	width = img.size[0]
 	height = img.size[1]
 	pix = img.load()
 	colors = {}
+	print("Здесь начинается цикл - "+ str(time.time()-start_time))
+	old_time = time.time()
 	for x in range(0,width,10):
 		for y in range(0,height,10):
 			r = pix[x,y][0]
 			g = pix[x,y][1]
 			b = pix[x,y][2]
 			rgb = (r,g,b)
+			print("Здесь начинается функция поиска ближайших - "+ str(time.time()-start_time))
+			start_time = time.time()
 			name = find_nearest(rgb)
-
+			print("Здесь заканчивается функция поиска ближайших - "+ str(time.time()-start_time))
+			start_time = time.time()
 			if name in colors:
 				colors[name] += 1
 			else:
 				colors[name] = 1
-		print(colors)
 	return (colors, width*height)
-
+	print("Здесь заканчивается цикл - "+ str(time.time()-old_time))
+	start_time = time.time()
 colors,size = count_colors()
 new_colors = {}
 for key in colors:
