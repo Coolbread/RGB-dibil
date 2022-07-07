@@ -2,34 +2,17 @@ from PIL import Image
 import requests
 from io import BytesIO
 from webcolors import hex_to_rgb
+import yaml
+import time
 
+file_path = "Config.yml"
 
-hex_to_names = {
-	"#000000" : "Black",
-	"#808080" : "Gray",
-	"#FFFFFF" : "White",
-	"#FF00FF" : "Fuchsia",
-	"#800080" : "Purple",
-	"#ff0000" : "Red",
-	"#800000" : "Maroon",	
-	"#8b4513" : "Brown",
-	"#ffff00" : "Yellow",
-	"#808000" : "Olive",
-	"#00ff00" : "Lime",
-	"#008000" : "Green",
-	"#00ffff" : "Aqua",
-	"#008080" : "Teal",
-	"#0000ff" : "Blue",
-	"#000080" : "Navy",
-	"#f5deb3" : "Wheat",
-	"#a0522d" : "Sienna",
-	"#ffdab9" : "PeachPuff",
-	"#4b0082" : "Indigo",
-	"#9400d3" : "DarkViolet",
-	"#ff1493" : "DeepPink",
-	"#dc143c" : "Crimson"
+def read_yaml(file_path):
+	with open(file_path, "r") as f:
+		return yaml.safe_load(f)
 
-}
+hex_to_names = read_yaml(file_path)
+print(hex_to_names)
 
 def find_image():
 	url = input()
@@ -56,25 +39,32 @@ def find_nearest(rgb):
 	return nearest_color
 
 def count_colors():
+	start_time = time.time()
 	img = find_image()
-	if img != None:
-		width = img.size[0]
-		height = img.size[1]
-		pix = img.load()
-		colors = {}
-		for x in range(0,width,10):
-			for y in range(0,height,10):
-				r = pix[x,y][0]
-				g = pix[x,y][1]
-				b = pix[x,y][2]
-				rgb = (r,g,b)
-				name = find_nearest(rgb)
+	time_find_image = time.time() - start_time
+	print("Время на поиск пикчи - " + str(time_find_image))
+	width = img.size[0]
+	height = img.size[1]
+	pix = img.load()
+	colors = {}
+	start_time = time.time()	
+	for x in range(0,width,10):
+		for y in range(0,height,10):
+			r = pix[x,y][0]
+			g = pix[x,y][1]
+			b = pix[x,y][2]
+			rgb = (r,g,b)
+			name = find_nearest(rgb)
 
-				if name in colors:
-					colors[name] += 1
-				else:
-					colors[name] = 1
-		return (colors, width*height)
+			if name in colors:
+				colors[name] += 1
+			else:
+				colors[name] = 1
+	time_count = time.time() - start_time
+	print("Время на сортировку пикселей по цветам - "+ str(time_count))	
+	return (colors, width*height)
+
+start_time = time.time()
 
 colors,size = count_colors()
 new_colors = {}
@@ -82,3 +72,4 @@ for key in colors:
 	percent = colors[key]*10000 / size
 	new_colors[key] = f"{percent:.{1}f}"
 print(new_colors)
+print("Конец проги - " + str(time.time() - start_time))
