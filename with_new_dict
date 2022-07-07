@@ -11,7 +11,8 @@ hex_to_names = {
 	"#FF00FF" : "Fuchsia",
 	"#800080" : "Purple",
 	"#ff0000" : "Red",
-	"#800000" : "Maroon",
+	"#800000" : "Maroon",	
+	"#8b4513" : "Brown",
 	"#ffff00" : "Yellow",
 	"#808000" : "Olive",
 	"#00ff00" : "Lime",
@@ -20,19 +21,22 @@ hex_to_names = {
 	"#008080" : "Teal",
 	"#0000ff" : "Blue",
 	"#000080" : "Navy",
-	"#a52a2a" : "Brown",
 	"#f5deb3" : "Wheat",
 	"#a0522d" : "Sienna",
 	"#ffdab9" : "PeachPuff",
 	"#4b0082" : "Indigo",
 	"#9400d3" : "DarkViolet",
 	"#ff1493" : "DeepPink",
+	"#dc143c" : "Crimson"
 
 }
 
 def find_image():
 	url = input()
-	response = requests.get(url)
+	headers = {
+		"User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.66 Safari/537.36 Edg/103.0.1264.44"
+	}
+	response = requests.get(url, headers = headers)
 	img = Image.open(BytesIO(response.content))
 	return img
 
@@ -53,23 +57,24 @@ def find_nearest(rgb):
 
 def count_colors():
 	img = find_image()
-	width = img.size[0]
-	height = img.size[1]
-	pix = img.load()
-	colors = {}
-	for x in range(0,width,10):
-		for y in range(0,height,10):
-			r = pix[x,y][0]
-			g = pix[x,y][1]
-			b = pix[x,y][2]
-			rgb = (r,g,b)
-			name = find_nearest(rgb)
+	if img != None:
+		width = img.size[0]
+		height = img.size[1]
+		pix = img.load()
+		colors = {}
+		for x in range(0,width,10):
+			for y in range(0,height,10):
+				r = pix[x,y][0]
+				g = pix[x,y][1]
+				b = pix[x,y][2]
+				rgb = (r,g,b)
+				name = find_nearest(rgb)
 
-			if name in colors:
-				colors[name] += 1
-			else:
-				colors[name] = 1
-	return (colors, width*height)
+				if name in colors:
+					colors[name] += 1
+				else:
+					colors[name] = 1
+		return (colors, width*height)
 
 colors,size = count_colors()
 new_colors = {}
